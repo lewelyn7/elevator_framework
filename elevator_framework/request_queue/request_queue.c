@@ -1,149 +1,118 @@
 // C program for array implementation of queue
 #include <limits.h>
 #include <stdio.h>
-#include <time.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#define QUEUE_SIZE 3  
 
-#define CAPACITY 16
-
-enum elev_req_type{
-    ORDER, TRANSPORT
-};
 typedef struct request{
-    enum elev_req_type type;
-    int from;
-    int to;
-    time_t timestamp;
-    struct request * next; 
+    int from_floor;
 } request;
-
 // A structure to represent a queue
-struct request_queue {
-    request * front;
-    request * end;
-    int size;
+struct RequestQueue {
+    int front, rear, size;
     unsigned capacity;
+    request array[QUEUE_SIZE];
 };
- 
+  
 // function to create a queue
 // of given capacity.
 // It initializes size of queue as 0
-int createQueue(struct request_queue *q)
+void initQueue(struct RequestQueue * queue)
 {
-    
 
-    q->front = q->end = NULL;
-    q->size = 0;
-    q->capacity = CAPACITY;
-    return 0;
-}  
- 
+    queue->capacity = QUEUE_SIZE;
+    queue->front = queue->size = 0;
+    // This is important, see the enqueue
+    queue->rear = QUEUE_SIZE - 1;
+     
+}
+  
 // Queue is full when size becomes
 // equal to the capacity
-int isFull(struct request_queue* queue)
+bool isFull(struct RequestQueue* queue)
 {
     return (queue->size == queue->capacity);
 }
- 
+  
 // Queue is empty when size is 0
-int isEmpty(struct request_queue* queue)
+bool isEmpty(struct RequestQueue* queue)
 {
     return (queue->size == 0);
 }
- 
+  
 // Function to add an item to the queue.
 // It changes rear and size
-
-// The function to add a key k to q
-// A utility function to create a new linked list node.
-request* newNode(request * req)
+void enqueue(struct RequestQueue* queue, request item)
 {
-    request* temp = (struct request*)malloc(sizeof(request));
-    *temp = *req;
-    temp->next = NULL;
-    return temp;
+    if (isFull(queue))
+        return;
+    queue->rear = (queue->rear + 1)
+                  % queue->capacity;
+    queue->array[queue->rear] = item;
+    queue->size = queue->size + 1;
 }
-
-int enqueue(struct request_queue* q, request * req)
-{
-    if(q->capacity <= q->size){
-        return -2; // ERROR is full
-    }
-
-    request * temp = newNode(req);
-    q->size++;
-    // If queue is empty, then new node is front and rear both
-    if (q->end == NULL) {
-        q->front = q->end = temp;
-        return 0;
-    }
   
-    // Add the new node at the end of queue and change rear
-    q->end->next = temp;
-    q->end = temp;
-    return 0;
-}
-
-// int enqueue(struct request_queue* queue, const request *item)
-// {
-//     if (isFull(queue))
-//         return -2;
-//     queue->rear = (queue->rear + 1)
-//                   % queue->capacity;
-//     queue->array[queue->rear] = *item;
-//     queue->size = queue->size + 1;
-//     return 0;
-// }
- 
-int dequeue(struct request_queue* q, request * req)
-{
-    // If queue is empty, return NULL.
-    if (q->front == NULL)
-        return -2;
-  
-    q->size--;
-    // Store previous front and move front one node ahead
-    request* temp = q->front;
-    *req = *temp;
-    q->front = q->front->next;
-  
-    // If front becomes NULL, then change rear also as NULL
-    if (q->front == NULL)
-        q->end = NULL;
-  
-    free(temp);
-}
-
-
 // Function to remove an item from queue.
 // It changes front and size
-// int dequeue(struct request_queue* queue, request * res)
+request dequeue(struct RequestQueue* queue)
+{
+    // if (isEmpty(queue))
+    //     return INT_MIN;
+    request item = queue->array[queue->front];
+    queue->front = (queue->front + 1)
+                   % queue->capacity;
+    queue->size = queue->size - 1;
+    return item;
+}
+  
+// Function to get front of queue
+request front(struct RequestQueue* queue)
+{
+    // if (isEmpty(queue))
+    //     return INT_MIN;
+    return queue->array[queue->front];
+}
+  
+// Function to get rear of queue
+request rear(struct RequestQueue* queue)
+{
+    // if (isEmpty(queue))
+    //     return request{from_floor=-1};
+    return queue->array[queue->rear];
+}
+  
+
+void print_queue(struct RequestQueue* queue){
+    printf("%d,%d,%d", queue->size, queue->front, queue->rear);
+    int end_arr = queue->rear;
+    if(queue->rear < queue->front) end_arr = queue->capacity-1;
+    if(queue->size > 0){
+
+        for(int i = queue->front; i <= end_arr; i++){
+            printf(",%d", queue->array[i].from_floor);
+        }
+        if(queue->rear < queue->front){
+            for(int i = 0; i <= queue->rear; i++){
+                printf(",%d", queue->array[i].from_floor);
+            }        
+        }
+
+    }
+
+    printf("\n");
+}
+// Driver program to test above functions./
+// int main()
 // {
-//     if(res == NULL){
-//         return -1;
-//     }
-//     if (isEmpty(queue))
-//         return -2;
-//     request item = queue->array[queue->front];
-//     queue->front = (queue->front + 1)
-//                    % queue->capacity;
-//     queue->size = queue->size - 1;
-//     *res = item;
+//     struct RequestQueue* queue = createQueue(1000);
+  
+//     enqueue(queue, 10);
+//     enqueue(queue, 20);
+//     enqueue(queue, 30);
+//     enqueue(queue, 40);
+  
+
+  
 //     return 0;
 // }
- 
-// Function to get front of queue
-int front(struct request_queue* q, request * res)
-{
-    if(res == NULL){
-        return -1;
-    }    
-    if (q->size == 0)
-        return -2;
-
-    *res = *(q->front);
-    return 0;
-}
- 
-
- 

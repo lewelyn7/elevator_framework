@@ -1,0 +1,5 @@
+* sprawdzanie request kolejki po przyjezdzie na kazde pietro
+* czy da sie latwo zmienic liczbe pieter?
+* czy da sie latwo dodac offset?
+* czy da sie latwo dodac sekcje?
+* CI/CD
