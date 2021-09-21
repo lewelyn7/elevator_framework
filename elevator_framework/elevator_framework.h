@@ -2,7 +2,7 @@
 #define ELEVATORS_FRAMEWORK
 #include <stdbool.h>
 
-#define ELEVATORS_QUANTITY 3 // TODO dynamic or static make on
+#define ELEVATORS_QUANTITY 3 
 #define BUTTONS_NUMBER 9
 
 typedef struct elevator_status{

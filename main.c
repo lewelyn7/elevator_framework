@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "elevator_framework/elevator_framework.h"
-// #include "elevator_framework/elevator_framework.c"
 
 bool mode_manual = false;
 
@@ -20,7 +19,7 @@ int parse_input_and_invoke(char* cmd, elevators_section *ele_sec){
         }
     }else if(cmd[0] == 'r'){
         int from_floor;
-        sscanf(cmd, "r%d", &from_floor); // TODO validate max queue
+        sscanf(cmd, "r%d", &from_floor);
         if(add_request(ele_sec, from_floor) != 0){
             printf("error: wrong argument\n\n");
         }
