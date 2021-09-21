@@ -1,5 +1,2 @@
 all:
-	gcc main.c -o main
-elevator_test:
-	make all
-	./main
+	gcc main.c elevator_framework/elevator_framework.c -o main

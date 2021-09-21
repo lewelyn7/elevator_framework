@@ -1,35 +1,7 @@
 #include "elevator_framework.h"
-#include "request_queue/request_queue.c"
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 
-
-#define ELEVATORS_QUANTITY 3 // TODO dynamic or static make on
-#define BUTTONS_NUMBER 16
-
-typedef struct elevator_status{
-    int id;
-    int current_floor;
-    int target_floor;
-    bool buttons[BUTTONS_NUMBER];
-    bool door_open;
-    int btn_floor_offset;
-
-} elevator_status;
-
-
-struct request_orders{
-    unsigned int current_max;
-    unsigned int orders[BUTTONS_NUMBER];
-};
-
-typedef struct elevators_section{
-    elevator_status elevators[ELEVATORS_QUANTITY];
-    int elevators_quantity;
-    // struct RequestQueue request_queue;
-    struct request_orders reqs;
-} elevators_section;
 
 
 
@@ -50,7 +22,7 @@ elevator_status elevator_init(int id){
 }
 
 
-elevators_section elevator_section_init(int quantity){ // init with pointer or not?
+elevators_section elevator_section_init(){ // init with pointer or not?
     elevators_section ele_sec;
     ele_sec.elevators_quantity = ELEVATORS_QUANTITY;
     for(int i = 0; i < ele_sec.elevators_quantity; i++){
@@ -64,9 +36,7 @@ elevators_section elevator_section_init(int quantity){ // init with pointer or n
     return ele_sec;
 }
 
-// int add_request(struct elevator_state * elevator, request *req){
-//     enqueue(&elevator->queue, req);
-// }
+
 int press_button(elevator_status * elevator, int num){
     elevator->buttons[num] = true;
 }
