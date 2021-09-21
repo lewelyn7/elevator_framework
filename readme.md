@@ -1,6 +1,10 @@
 
 
 ## Elevator framework
+# Example:
+![CircleCI](https://circleci.com/gh/lewelyn7/elevator_framework.svg?style=svg)
+
+https://circleci.com/gh/lewelyn7/elevator_framework.svg?style=svg
 Simple program to simulate behaviour of elevators
 
 ## Usage
