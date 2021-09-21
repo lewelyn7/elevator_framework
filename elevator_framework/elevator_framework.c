@@ -151,15 +151,10 @@ void move_all_elevators(elevators_section * ele_sec){
 
 void simulation_one_step(elevators_section * ele_sec){
 
-    // buttons, request etc TODO
-
     calc_new_states(ele_sec);
 
     move_all_elevators(ele_sec);
 
-    // print_whole_section(ele_sec);
-
-    // print state
 }
 void print_elevator(elevator_status * elevator){
 
