@@ -13,7 +13,7 @@ Then run it by simply calling `./main`
 
 Application takes one optional argument `-m`, which enables output in more human-readable format.
 
-After start application waits for user input. There are several commands possible:
+After start, application waits for user's input. There are several commands possible:
  * `s` - one step of simulation
  * `bN,M` - press button *N* in elevator *M*
  * `rN` - request elevator from floor *N*
@@ -56,14 +56,14 @@ b1,4
 ## Tests
 Tests are written in *Python* using *pytest* framework
 
-To execute tests first install all libraries (preferably in virutal environment):
+To execute tests firstly install all libraries (preferably in virutal environment):
 
 ```sh
 python -m pip install -r requirements.txt
 python -m pip install pytest
 ```
 
-And call pytest to run the tests
+Then call pytest to run the tests
 ```sh
 python -m pytest
 ```
