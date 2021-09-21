@@ -4,24 +4,7 @@
 #define PRINT_GREEN printf("\e[32m");
 #define MODE_MANUAL 0
 
-// void test_case(){
-//     struct elevator_state elevator1 = elevator_init(0);
-//     request req;
-//     req.from = 0;
-//     req.to = 1;
-//     enqueue(&elevator1.queue, &req);
-//     print_elevator_status(&elevator1, true);
-//     calc_next_move(&elevator1);
-//     print_elevator_status(&elevator1, true);
-//     move_one_step(&elevator1);
-//     print_elevator_status(&elevator1, true);
-//     press_button(&elevator1, 3);
-//     print_elevator_status(&elevator1, true);
-//     _calc_move_print(&elevator1);
-//     _calc_move_print(&elevator1);
-//     _calc_move_print(&elevator1);
-//     _calc_move_print(&elevator1);
-// }
+
 int parse_input_and_invoke(char* cmd, elevators_section *ele_sec){
     // if(){
     //     printf("no cmd\r\n");
@@ -39,7 +22,7 @@ int parse_input_and_invoke(char* cmd, elevators_section *ele_sec){
     }else if(cmd[0] == 'r'){
         request req; 
         sscanf(cmd, "r%d", &req.from_floor); // TODO validate max queue
-        enqueue(&(ele_sec->request_queue), req);
+        add_request(ele_sec, req.from_floor);
     }else if(cmd[0] == 'e'){
         return 2;
     }

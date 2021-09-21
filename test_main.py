@@ -9,12 +9,11 @@ class Elevator(BaseModel):
     target_floor: int
     buttons: List[bool]
 
-class Request(BaseModel):
-    from_floor: int
+
 
 class Move(BaseModel):
     elevators: List[Elevator] = []
-    requests: List[Request] = []
+    requests: List[int] = []
 
 def parse_output(txt) -> List[Move]:
     moves = []
@@ -33,13 +32,11 @@ def parse_output(txt) -> List[Move]:
             ))
 
         requests_str = elevators_str[-1].split(',')
-        size = int(requests_str[0])
-        items = requests_str[3:] if size > 0 else []
-        requests = [Request(from_floor=item) for item in items]
+        # print(requests_str)
+        requests = [int(item) for item in requests_str]
         move.requests = requests
 
         moves.append(move)
-    # print(moves)
     return moves
         
 
@@ -59,6 +56,7 @@ def test_btn_order_cmd():
     input = "\n".join(input) + "\n"
     process = subprocess.run("./main", input=input, text=True, capture_output=True)
     moves = parse_output(process.stdout)
+    print(process.stdout)
     assert moves[-1].elevators[0].buttons[1] == True
     assert moves[-1].elevators[0].buttons[2] == True
 
@@ -68,16 +66,16 @@ def test_btn_order_cmd():
 def test_add_request_cmd():
     input = [
         "r0",
-        "r-2",
-        "r88",
+        "r2",
+        "r6",
         "e"
     ]
     input = "\n".join(input) + "\n"
     process = subprocess.run("./main", input=input, text=True, capture_output=True)
     moves = parse_output(process.stdout)
-    assert moves[-1].requests[0].from_floor == 0
-    assert moves[-1].requests[1].from_floor == -2
-    assert moves[-1].requests[2].from_floor == 88
+    assert moves[-1].requests[0] == 1
+    assert moves[-1].requests[2] == 2
+    assert moves[-1].requests[6] == 3
 
 
 
@@ -294,14 +292,13 @@ def test_btn_request_in_the_mid():
     input = "\n".join(input) + "\n"
     process = subprocess.run("./main", input=input, text=True, capture_output=True)
     moves = parse_output(process.stdout)
-
     # assert moves[6].elevators[0].current_floor == 4
     # assert moves[7].elevators[0].door_open == True
     
     assert moves[3].elevators[0].buttons[8] == True
     assert moves[3].elevators[1].buttons[8] == True
     assert moves[3].elevators[2].buttons[8] == True
-    assert moves[7].requests[0].from_floor == 4
+    assert moves[7].requests[4] == 1
 
     assert moves[8].elevators[0].current_floor == 4
     assert moves[9].elevators[0].door_open == True

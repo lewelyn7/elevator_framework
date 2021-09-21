@@ -19,11 +19,16 @@ typedef struct elevator_status{
 } elevator_status;
 
 
+struct request_orders{
+    unsigned int current_max;
+    unsigned int orders[BUTTONS_NUMBER];
+};
+
 typedef struct elevators_section{
     elevator_status elevators[ELEVATORS_QUANTITY];
     int elevators_quantity;
-    struct RequestQueue request_queue;
-    int request
+    // struct RequestQueue request_queue;
+    struct request_orders reqs;
 } elevators_section;
 
 
@@ -39,6 +44,7 @@ elevator_status elevator_init(int id){
         elevator.buttons[i] = false;
     }
 
+
     return elevator;
 
 }
@@ -50,7 +56,11 @@ elevators_section elevator_section_init(int quantity){ // init with pointer or n
     for(int i = 0; i < ele_sec.elevators_quantity; i++){
         ele_sec.elevators[i] = elevator_init(i);
     }
-    initQueue(&ele_sec.request_queue);
+    for(int i = 0; i < BUTTONS_NUMBER; i++){
+        ele_sec.reqs.orders[i] = 0;
+    }
+    ele_sec.reqs.current_max = 0;
+
     return ele_sec;
 }
 
@@ -94,6 +104,18 @@ void find_new_target_floor(elevator_status * elevator){
     }
 }
 
+int find_min(int *arr, int size, unsigned int current_max){
+    unsigned int current_min = current_max;
+    int current_idx = -1;
+    for(int i = 0; i < size; i++){
+        if(arr[i] <= current_min && arr[i] > 0){
+            current_min = arr[i];
+            current_idx = i;
+        }
+    }
+    return current_idx;
+}
+
 void calc_new_states(elevators_section * ele_sec){
     // close all doors
     for(int i = 0; i < ele_sec->elevators_quantity; i++){
@@ -102,19 +124,19 @@ void calc_new_states(elevators_section * ele_sec){
 
     // TODO implement offset
     for(int i = 0; i < ele_sec->elevators_quantity; i++){
-        if(ele_sec->elevators[i].buttons[ele_sec->elevators[i].current_floor] == true){
+        int current_floor = ele_sec->elevators[i].current_floor;
+
+        if(ele_sec->elevators[i].buttons[current_floor] == true){
                 ele_sec->elevators[i].door_open = true;
                 ele_sec->elevators[i].buttons[ele_sec->elevators[i].current_floor] = false;
+        }
+        if(ele_sec->reqs.orders[current_floor] > 0){
+            ele_sec->reqs.orders[current_floor] = 0;
+            ele_sec->elevators[i].door_open = true;
         }
     }
 
-    // TODO implement offset
-    for(int i = 0; i < ele_sec->request_queue.capacity; i++){
-        if(ele_sec->elevators[i].current_floor == ele_sec->request_queue.array[]){
-                ele_sec->elevators[i].door_open = true;
-                ele_sec->elevators[i].buttons[ele_sec->elevators[i].current_floor] = false;
-        }
-    }
+
 
 
     // open doors
@@ -126,12 +148,17 @@ void calc_new_states(elevators_section * ele_sec){
         }
     }
 
+
     for(int i = 0; i < ele_sec->elevators_quantity; i++){
         if(ele_sec->elevators[i].target_floor == ele_sec->elevators[i].current_floor){
-            if(!isEmpty(&(ele_sec->request_queue))){
-                request req = dequeue(&(ele_sec->request_queue));
-                ele_sec->elevators[i].target_floor = req.from_floor;
-            }
+
+            int found_floor  = find_min(ele_sec->reqs.orders, BUTTONS_NUMBER ,ele_sec->reqs.current_max);
+            
+            if(found_floor == -1) break;
+            
+            ele_sec->reqs.orders[found_floor] = 0;
+            ele_sec->elevators[i].target_floor = found_floor;
+            
         }
     }
     
@@ -173,7 +200,13 @@ void print_elevator(elevator_status * elevator){
     printf("%d\n", elevator->buttons[BUTTONS_NUMBER-1]);
 
 }
+void print_arr(unsigned int arr[], int size){
+    for(int i = 0; i < size-1; i++){
+        printf("%d,", arr[i]);
+    }
+    printf("%d\n", arr[size-1]);
 
+}
 void print_elevator_manual(elevator_status * elevator){
 
     printf("id:%d, door:%d, current_floor:%d, target_floor:%d, buttons:", elevator->id, elevator->door_open, elevator->current_floor, elevator->target_floor);
@@ -188,109 +221,22 @@ void print_whole_section(elevators_section * ele_sec){
     for(int i = 0; i < ele_sec->elevators_quantity; i++){
         print_elevator(&(ele_sec->elevators[i]));
     }
-    print_queue(&(ele_sec->request_queue));
+    print_arr((ele_sec->reqs.orders), BUTTONS_NUMBER);
     printf("\n");
 }
+
+
+
 void print_whole_section_manual(elevators_section * ele_sec){
     for(int i = 0; i < ele_sec->elevators_quantity; i++){
         print_elevator_manual(&(ele_sec->elevators[i]));
     }
-    print_queue(&(ele_sec->request_queue));
+
+    print_arr((ele_sec->reqs.orders), BUTTONS_NUMBER);
     printf("\n");
 }
-// void calc_next_move(struct elevator_state * elevator){
-//     int current = elevator->status.current_floor;
-//     int target = elevator->status.target_floor;
-//     bool* buttons = elevator->status.desired_floors;
-//     if(elevator->status.door_open == true){
-//         elevator->status.door_open = false;
-//     }
-//     if(true || current == target){
-//         int nearest_floor = current;
-//         int nearest_distance = INT_MAX;
-//         for(int i = 0; i < BUTTONS_NUMBER; i++){
-//             if(buttons[i] == true){
-//                 int distance = abs(i - current);
-//                 if(current == i){
-//                     buttons[i] = false;
-//                     continue;
-//                 }
-//                 if (distance < nearest_distance)
-//                 {
-//                     if ((current < target && (i - current > 0)) || (current > target && (i - current < 0)) || (current == target))
-//                     {
-//                         nearest_distance = distance;
-//                         nearest_floor = i;
-//                     }
-//                 }
-//             }
-//         }
-//         target = nearest_floor;
-//     }
-//     if(current == target){
-//         request req;
-//         //TODO when request is handling and someone presses the button request is lost
-//         if(!front(&elevator->queue, &req)){
-//             target = req.from;
-//         }
 
-//         //TO TEST
-//         if(current == req.from){
-//             dequeue(&elevator->queue, &req);
-//         }
-        
-//     }
-//     if(current != target){
-//         // check if someone can be picked up
-
-//         //TODO
-//     }
-
-//     elevator->status.target_floor = target;    
-// }
-
-
-
-// void move_one_step(struct elevator_state * elevator){
-//     int current = elevator->status.current_floor;
-//     int target = elevator->status.target_floor;
-//     if(current != target){
-//         if(current < target){
-//             current++;
-//         }else{
-//             current--;
-//         }
-//     }
-//     if(current == target){
-//         elevator->status.door_open = true;
-//     }
-    
-//     elevator->status.current_floor = current;
-// }
-// void print_elevator_status(struct elevator_state * elevator, bool queue_too){
-//     printf("ELEVATOR id: %d", elevator->status.id);
-//     if(elevator->status.door_open) printf("  [door opened]");
-//     printf("\r\n");
-//     printf("\t current: %d \r\n", elevator->status.current_floor);
-//     printf("\t target: %d \r\n", elevator->status.target_floor);
-//     printf("PRESSED BUTTONS: ");
-//     for(int i = 0; i < BUTTONS_NUMBER; i++){
-//         if(elevator->status.desired_floors[i])
-//             printf("%d ", i);
-//     }
-//     printf("\n");
-//     printf("QUEUE\n");
-//     for(request* req = elevator->queue.front; req != NULL; req = req->next){
-
-//         printf("\t request from:%d to:%d at:%lld \n", req->from, req->to, req->timestamp);
-//     }
-//     printf("-------------------\r\n");
-//     printf("\r\n");
-
-// }
-
-// void _calc_move_print(struct elevator_state * elevator){
-//     calc_next_move(elevator);
-//     move_one_step(elevator);
-//     print_elevator_status(elevator, true);
-// } 
+void add_request(elevators_section * ele_sec, int from_floor){
+    ele_sec->reqs.current_max++;
+    ele_sec->reqs.orders[from_floor] = ele_sec->reqs.current_max;
+}
