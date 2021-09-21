@@ -15,14 +15,21 @@ int parse_input_and_invoke(char* cmd, elevators_section *ele_sec){
         int btn;
         int elevator_i;
         sscanf(cmd, "b%d,%d", &elevator_i, &btn);
-        press_button(&(ele_sec->elevators[elevator_i]), btn);
+        if(press_button(&(ele_sec->elevators[elevator_i]), btn) != 0){
+            printf("error: wrong argument\n\n");
+        }
     }else if(cmd[0] == 'r'){
         int from_floor;
         sscanf(cmd, "r%d", &from_floor); // TODO validate max queue
-        add_request(ele_sec, from_floor);
+        if(add_request(ele_sec, from_floor) != 0){
+            printf("error: wrong argument\n\n");
+        }
     }else if(cmd[0] == 'e'){
         return 2;
+    }else{
+        printf("no such command\n\n");
     }
+
     if(mode_manual){
         print_whole_section_manual(ele_sec);
     }else{

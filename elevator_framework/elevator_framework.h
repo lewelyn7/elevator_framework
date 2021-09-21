@@ -33,7 +33,7 @@ elevators_section elevator_section_init();
 int press_button(elevator_status * elevator, int num);
 void simulation_one_step(elevators_section * ele_sec);
 void print_whole_section_manual(elevators_section * ele_sec);
-void add_request(elevators_section * ele_sec, int from_floor);
+int add_request(elevators_section * ele_sec, int from_floor);
 void print_whole_section(elevators_section * ele_sec);
 
 

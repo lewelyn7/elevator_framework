@@ -36,9 +36,20 @@ elevators_section elevator_section_init(){ // init with pointer or not?
     return ele_sec;
 }
 
-
+int add_request(elevators_section * ele_sec, int from_floor){
+    if(from_floor >= BUTTONS_NUMBER || from_floor < 0){
+        return -1;
+    }
+    ele_sec->reqs.current_max++;
+    ele_sec->reqs.orders[from_floor] = ele_sec->reqs.current_max;
+    return 0;
+}
 int press_button(elevator_status * elevator, int num){
+    if(num >= BUTTONS_NUMBER || num < 0){
+        return -1;
+    }
     elevator->buttons[num] = true;
+    return 0;
 }
 
 void find_new_target_floor(elevator_status * elevator){
@@ -174,7 +185,7 @@ void print_arr(unsigned int arr[], int size){
 }
 void print_elevator_manual(elevator_status * elevator){
 
-    printf("id:%d, door:%d, current_floor:%d, target_floor:%d, buttons:", elevator->id, elevator->door_open, elevator->current_floor, elevator->target_floor);
+    printf("id:%d, door_open:%d, current_floor:%d, target_floor:%d, buttons:", elevator->id, elevator->door_open, elevator->current_floor, elevator->target_floor);
     for(int i = 0; i < BUTTONS_NUMBER-1; i++){
         printf("%d,", elevator->buttons[i]);
     }
@@ -196,12 +207,8 @@ void print_whole_section_manual(elevators_section * ele_sec){
     for(int i = 0; i < ele_sec->elevators_quantity; i++){
         print_elevator_manual(&(ele_sec->elevators[i]));
     }
-
+    printf("requests_order:");
     print_arr((ele_sec->reqs.orders), BUTTONS_NUMBER);
     printf("\n");
 }
 
-void add_request(elevators_section * ele_sec, int from_floor){
-    ele_sec->reqs.current_max++;
-    ele_sec->reqs.orders[from_floor] = ele_sec->reqs.current_max;
-}
