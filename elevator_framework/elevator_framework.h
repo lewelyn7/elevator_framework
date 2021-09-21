@@ -3,7 +3,7 @@
 #include <stdbool.h>
 
 #define ELEVATORS_QUANTITY 3 // TODO dynamic or static make on
-#define BUTTONS_NUMBER 16
+#define BUTTONS_NUMBER 9
 
 typedef struct elevator_status{
     int id;

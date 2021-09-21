@@ -35,7 +35,6 @@ int parse_input_and_invoke(char* cmd, elevators_section *ele_sec){
 }
 int main(int argc, char** argv){
     if(argc >= 2){
-        // printf("please provide mode of execution");
         if(argv[1][1] == 'm'){
             mode_manual = true;
         }
