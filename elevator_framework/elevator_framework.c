@@ -22,7 +22,7 @@ elevator_status elevator_init(int id){
 }
 
 
-elevators_section elevator_section_init(){ // init with pointer or not?
+elevators_section elevator_section_init(){
     elevators_section ele_sec;
     ele_sec.elevators_quantity = ELEVATORS_QUANTITY;
     for(int i = 0; i < ele_sec.elevators_quantity; i++){
@@ -53,8 +53,7 @@ int press_button(elevator_status * elevator, int num){
 }
 
 void find_new_target_floor(elevator_status * elevator){
-    // not implemented TODO
-    // raise;
+
     bool edge_cnt_up = false;
     bool edge_cnt_down = false;
     for(int step = 1; step < BUTTONS_NUMBER; step++){
@@ -103,7 +102,7 @@ void calc_new_states(elevators_section * ele_sec){
         ele_sec->elevators[i].door_open = false;
     }
 
-    // TODO implement offset
+    // open doors when reach non-target
     for(int i = 0; i < ele_sec->elevators_quantity; i++){
         int current_floor = ele_sec->elevators[i].current_floor;
 
@@ -120,7 +119,7 @@ void calc_new_states(elevators_section * ele_sec){
 
 
 
-    // open doors
+    // open doors when reach target floor
     for(int i = 0; i < ele_sec->elevators_quantity; i++){
         if(ele_sec->elevators[i].current_floor == ele_sec->elevators[i].target_floor){
             ele_sec->elevators[i].door_open = true;
@@ -130,6 +129,7 @@ void calc_new_states(elevators_section * ele_sec){
     }
 
 
+    // handle requests from outside of elevator
     for(int i = 0; i < ele_sec->elevators_quantity; i++){
         if(ele_sec->elevators[i].target_floor == ele_sec->elevators[i].current_floor){
 
